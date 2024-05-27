@@ -1,13 +1,17 @@
 const express = require("express");
 const bodyparser = require("body-parser");
 const nodemailer = require("nodemailer");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
+
+app.use(cors());
 
 app.use(bodyparser.json());
 
-app.get("/warmup", (res) => {
+app.get("/warmup", (req, res) => {
   res.send("Server is warming up!");
   console.log("There was activity and I am warming up!");
 });
@@ -15,6 +19,8 @@ app.get("/warmup", (res) => {
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body;
+    console.log(process.env.EMAIL);
+    console.log(process.env.PASS);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -25,9 +31,9 @@ app.post("/contact", async (req, res) => {
     });
 
     const mailOptions = {
-      from: email,
+      from: process.env.EMAIL,
       to: process.env.RECIPIENT,
-      subject: "New Message from Contact Form",
+      subject: `Contact Form: New Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
     };
 
